@@ -1,0 +1,1382 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+<head> <meta charset="UTF-8"> 
+<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+<title>LexiQuest: Interactive Word Realm</title> 
+<style>
+* { box-sizing: border-box; }
+    body {
+  font-family: Arial, sans-serif;
+  background: #121212;
+  color: #ffffff;
+  padding: 20px;
+  margin: 0;
+}
+.box {
+  max-width: 700px;
+  margin: 0 auto;
+  background: #1e1e1e;
+  padding: 25px;
+  border-radius: 15px;
+  border: 1px solid #333;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+h1 {
+  color: #bb86fc;
+  margin: 0;
+  font-size: 25px;
+}
+h2 {
+  color: #03dac6;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.badge {
+  background: #03dac6;
+  color: #000;
+  padding: 7px 12px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.level-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 15px;
+  font-weight: bold;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+.easy {
+  background: #2d6a4f;
+  color: #d8f3dc;
+}
+.medium {
+  background: #9a6700;
+  color: #fff3cd;
+}
+.hard {
+  background: #800f2f;
+  color: #ffccd5;
+}
+.scenario {
+  background: #2a2a2a;
+  padding: 17px;
+  border-radius: 9px;
+  margin: 15px 0;
+  font-size: 16px;
+  line-height: 1.6;
+}
+.question-number {
+  color: #aaa;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+.btn {
+  display: block;
+  width: 100%;
+  background: #333;
+  color: white;
+  border: 1px solid #555;
+  padding: 13px;
+  margin: 10px 0;
+  border-radius: 7px;
+  text-align: left;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.btn:hover:not(:disabled) {
+  background: #444;
+  transform: translateY(-1px);
+}
+.btn:disabled {
+  cursor: default;
+}
+.correct {
+  background: #1b4332 !important;
+  border-color: #2d6a4f !important;
+  color: #d8f3dc !important;
+}
+.wrong {
+  background: #4a0e17 !important;
+  border-color: #800f2f !important;
+  color: #ffccd5 !important;
+}
+.explanation {
+  background: #252525;
+  border: 1px solid #444;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 15px;
+  display: none;
+}
+.exp-item {
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #333;
+  line-height: 1.5;
+}
+.exp-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+.next-btn,
+.level-btn {
+  background: #bb86fc;
+  color: #000;
+  border: none;
+  padding: 13px 20px;
+  border-radius: 7px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 15px;
+  font-size: 16px;
+}
+.next-btn:hover,
+.level-btn:hover {
+  background: #a970e8;
+}
+.level-btn {
+  text-align: center;
+  margin: 12px 0;
+}
+.easy-btn {
+  background: #2d6a4f;
+  color: white;
+}
+.medium-btn {
+  background: #9a6700;
+  color: white;
+}
+.hard-btn {
+  background: #800f2f;
+  color: white;
+}
+.hidden {
+  display: none !important;
+}
+.progress-container {
+  background: #333;
+  height: 8px;
+  border-radius: 10px;
+  margin: 10px 0 20px;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  background: #bb86fc;
+  width: 0%;
+  transition: width 0.3s;
+}
+.fill-container {
+  margin-top: 20px;
+}
+.fill-input {
+  width: 100%;
+  padding: 13px;
+  background: #181818;
+  border: 1px solid #555;
+  border-radius: 7px;
+  color: white;
+  font-size: 16px;
+  margin: 8px 0;
+}
+.fill-input:focus {
+  outline: none;
+  border-color: #bb86fc;
+}
+.blank-question {
+  background: #202020;
+  padding: 12px;
+  border-radius: 7px;
+  margin: 12px 0;
+  line-height: 1.7;
+}
+.word-bank {
+  background: #2a2a2a;
+  padding: 12px;
+  border-radius: 7px;
+  margin: 15px 0;
+  color: #ddd;
+}
+.word {
+  display: inline-block;
+  background: #3a3a3a;
+  padding: 5px 9px;
+  border-radius: 5px;
+  margin: 3px;
+  color: #bb86fc;
+}
+.result-score {
+  font-size: 28px;
+  color: #bb86fc;
+  font-weight: bold;
+}
+.instructions {
+  color: #bbb;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+.section-title {
+  color: #03dac6;
+  border-bottom: 1px solid #333;
+  padding-bottom: 8px;
+  margin-top: 25px;
+}
+@media (max-width: 600px) {
+  body {
+    padding: 10px;
+  }
+  .box {
+    padding: 18px;
+  }
+  .header {
+    align-items: flex-start;
+  }
+  h1 {
+    font-size: 21px;
+  }
+  .badge {
+    font-size: 11px;
+  }
+}
+</style> 
+</head>
+<body>
+<div class="box">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>📚 LexiQuest</h1>
+    <span class="badge" id="score">Score: 0 XP</span>
+  </div>
+
+  <!-- LEVEL SELECTOR -->
+  <div id="level-stage">
+    <h2>Choose Your Difficulty</h2>
+
+    <p class="instructions">
+      Test your vocabulary skills through multiple-choice questions
+      and fill-in-the-blank exercises. Choose a level to begin.
+    </p>
+
+    <button class="level-btn easy-btn" onclick="startLevel('easy')">
+      🟢 EASY — Vocabulary Foundations
+    </button>
+
+    <button class="level-btn medium-btn" onclick="startLevel('medium')">
+      🟡 MEDIUM — Vocabulary in Context
+    </button>
+
+    <button class="level-btn hard-btn" onclick="startLevel('hard')">
+      🔴 HARD — Advanced Vocabulary
+    </button>
+  </div>
+
+
+  <!-- GAME STAGE -->
+  <div id="game-stage" class="hidden">
+
+    <div id="level-badge"></div>
+
+    <div class="question-number" id="question-number"></div>
+
+    <div class="progress-container">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <div class="scenario" id="scenario-box"></div>
+
+    <div id="choices-box"></div>
+
+    <!-- FILL-IN-THE-BLANK -->
+    <div id="fill-box" class="fill-container"></div>
+
+    <!-- EXPLANATION -->
+    <div class="explanation" id="explanation-box">
+      <h3 style="margin-top: 0; color: #bb86fc;">
+        💡 Meaning Breakdown
+      </h3>
+
+      <div id="exp-content"></div>
+    </div>
+
+    <!-- NEXT BUTTON -->
+    <button
+      class="next-btn hidden"
+      id="next-btn"
+      onclick="nextQuestion()">
+      Next Question →
+    </button>
+
+  </div>
+
+
+  <!-- RESULT STAGE -->
+  <div id="result-stage" class="hidden" style="text-align:center;">
+
+    <h2>🎉 Level Complete!</h2>
+
+    <p id="result-message">
+      Great work!
+    </p>
+
+    <div class="result-score" id="final-score">
+      0 XP
+    </div>
+
+    <button
+      class="next-btn"
+      style="display:block;"
+      onclick="restartGame()">
+      🔄 Play This Level Again
+    </button>
+
+    <button
+      class="next-btn"
+      style="display:block; background:#333; color:white;"
+      onclick="chooseLevel()">
+      📚 Choose Another Level
+    </button>
+
+  </div>
+
+</div>
+
+
+<script>
+/* =========================================================
+   LEXIQUEST GAME DATA
+   ========================================================= */
+
+var gameData = {
+
+  /* =======================================================
+     EASY
+     ======================================================= */
+
+  easy: {
+    title: "EASY LEVEL",
+    className: "easy",
+
+    questions: [
+
+      {
+        type: "multiple",
+        question: "1",
+        baseWord: "READ",
+        scenario:
+          "When you read a difficult passage and explain what the author means, which word best describes what you are doing?",
+
+        choices: [
+          {
+            word: "Interpret",
+            correct: true,
+            explanation:
+              "To explain or understand the meaning of information or text."
+          },
+          {
+            word: "Deceive",
+            correct: false,
+            explanation:
+              "To mislead or trick someone into believing something false."
+          },
+          {
+            word: "Conceal",
+            correct: false,
+            explanation:
+              "To hide or keep something out of sight."
+          }
+        ]
+      },
+
+      {
+        type: "multiple",
+        question: "2",
+        baseWord: "WRITE",
+        scenario:
+          "When you create a story, essay, or poem by putting your ideas into written form, which word best fits?",
+
+        choices: [
+          {
+            word: "Fabricate",
+            correct: false,
+            explanation:
+              "To invent or make up something, often to lie or deceive."
+          },
+          {
+            word: "Compose",
+            correct: true,
+            explanation:
+              "To write, create, or produce a piece of text, music, or art."
+          },
+          {
+            word: "Demolish",
+            correct: false,
+            explanation:
+              "To completely destroy or tear down a structure."
+          }
+        ]
+      },
+
+      {
+        type: "multiple",
+        question: "3",
+        baseWord: "TALK",
+        scenario:
+          "When you share your thoughts, ideas, or information with another person, which word best describes the action?",
+
+        choices: [
+          {
+            word: "Communicate",
+            correct: true,
+            explanation:
+              "To share or exchange information, news, or ideas."
+          },
+          {
+            word: "Suppress",
+            correct: false,
+            explanation:
+              "To forcibly put an end to or hold back something."
+          },
+          {
+            word: "Terminate",
+            correct: false,
+            explanation:
+              "To bring something to an end or conclusion."
+          }
+        ]
+      },
+
+      {
+        type: "multiple",
+        question: "4",
+        baseWord: "LISTEN",
+        scenario:
+          "When you become aware of sounds or understand something through your senses, which word best fits?",
+
+        choices: [
+          {
+            word: "Neglect",
+            correct: false,
+            explanation:
+              "To fail to care for or pay proper attention to something."
+          },
+          {
+            word: "Perceive",
+            correct: true,
+            explanation:
+              "To become aware of or interpret something through the senses."
+          },
+          {
+            word: "Disregard",
+            correct: false,
+            explanation:
+              "To ignore or treat something as unimportant."
+          }
+        ]
+      },
+
+      {
+        type: "multiple",
+        question: "5",
+        baseWord: "LOOK",
+        scenario:
+          "When you carefully watch something in order to notice details or monitor what is happening, which word best fits?",
+
+        choices: [
+          {
+            word: "Observe",
+            correct: true,
+            explanation:
+              "To notice or perceive something and monitor it attentively."
+          },
+          {
+            word: "Overlook",
+            correct: false,
+            explanation:
+              "To fail to notice or consider something."
+          },
+          {
+            word: "Evade",
+            correct: false,
+            explanation:
+              "To escape or avoid something, especially by cleverness."
+          }
+        ]
+      },
+
+      {
+        type: "fill",
+        question: "Textual Exercise 1",
+        title: "Easy Fill-in-the-Blank",
+        scenario:
+          "Read the passage and fill in each blank with the correct vocabulary word.",
+
+        passage:
+          "Every morning, students step into the literature class ready to learn. " +
+          "First, they carefully (1) ______ the text to understand its message. " +
+          "After reading, the teacher asks them to (2) ______ a brief response " +
+          "to share their thoughts in writing. To work effectively in groups, " +
+          "they must (3) ______ clearly with their peers. They must also " +
+          "(4) ______ the subtle details in the story that others might miss, " +
+          "and (5) ______ the tone of the narrator through auditory cues " +
+          "during class discussions.",
+
+        words: [
+          "interpret",
+          "compose",
+          "communicate",
+          "observe",
+          "perceive"
+        ],
+
+        answers: [
+          "interpret",
+          "compose",
+          "communicate",
+          "observe",
+          "perceive"
+        ]
+      }
+
+    ]
+  },
+
+
+  /* =======================================================
+     MEDIUM
+     ======================================================= */
+
+  medium: {
+    title: "MEDIUM LEVEL",
+    className: "medium",
+
+    questions: [
+
+      {
+        type: "multiple",
+        question: "11",
+        baseWord: "OPEN",
+        scenario:
+          "When you begin a new process or action, which word means to cause that process to begin?",
+
+        choices: [
+          {
+            word: "Initiate",
+            correct: true,
+            explanation:
+              "To cause a process or action to begin or open."
+          },
+          {
+            word: "Obstruct",
+            correct: false,
+            explanation:
+              "To block or get in the way of a path, clear view, or progress."
+          },
+          {
+            word: "Halt",
+            correct: false,
+            explanation:
+              "To bring or come to an abrupt stop."
+          }
+        ]
+      },
+
+      {
+        type: "multiple",
+        question: "12",
+        baseWord: "CLOSE",
+        scenario:
+          "When you bring something to an end or arrive at a final judgment, which word best fits?",
+
+        choices: [
+          {
+            word: "Prolong",
+            correct: false,
+            explanation:
+              "To extend the duration of something."
+          },
+          {
+            word: "Conclude",
+            correct: true,
+            explanation:
+              "To bring something to an end or arrive at a judgment."
+          },
+          {
+            word: "Expand",
+            correct: false,
+            explanation:
+              "To become or make larger or more extensive."
+          }
+        ]
+      },
+
+      {
+        type: "multiple",
+        question: "13",
+        baseWord: "START",
+        scenario:
+          "When a formal meeting, ceremony, or official activity begins, which word best fits?",
+
+        choices: [
+          {
+            word: "Commence",
+            correct: true,
+            explanation:
+              "To begin or start something formal or official."
+          },
+          {
+            word: "Postpone",
+            correct: false,
+            explanation:
+              "To delay an event to a later time."
+          },
+          {
+            word: "Defer",
+            correct: false,
+            explanation:
+              "To put off an action or event to a later time; to yield to another's judgment."
+          }
+        ]
+      },
+
+      {
+        type: "multiple",
+        question: "14",
+        baseWord: "FINISH",
+        scenario:
+          "When you successfully complete a task or achieve something you worked toward, which word best fits?",
+
+        choices: [
+          {
+            word: "Accomplish",
+            correct: true,
+            explanation:
+              "To achieve or complete a task successfully."
+          },
+          {
+            word: "Abandon",
+            correct: false,
+            explanation:
+              "To give up completely before finishing."
+          },
+          {
+            word: "Suspend",
+            correct: false,
+            explanation:
+              "To temporarily prevent from continuing or being in force."
+          }
+        ]
+      },
+
+      {
+        type: "multiple",
+        question: "15",
+        baseWord: "BUY",
+        scenario:
+          "When you obtain or acquire something, especially through careful effort or planning, which word best fits?",
+
+        choices: [
+          {
+            word: "Procure",
+            correct: true,
+            explanation:
+              "To obtain or acquire something, especially with care or effort."
+          },
+          {
+            word: "Squander",
+            correct: false,
+            explanation:
+              "To waste money, time, or opportunities recklessly."
+          },
+          {
+            word: "Liquidation",
+            correct: false,
+            explanation:
+              "The process of converting assets into cash or closing a business."
+          }
+        ]
+      },
+
+      {
+        type: "fill",
+        question: "Textual Exercise 3",
+        title: "Medium Fill-in-the-Blank",
+        scenario:
+          "Read the passage and fill in each blank with the correct vocabulary word.",
+
+        passage:
+          "The project manager called a meeting to (1) ______ a new " +
+          "organizational policy. Before the team could (2) ______ the new " +
+          "research phase, they needed to (3) ______ specialized software " +
+          "tools required for data collection. Everyone worked tirelessly " +
+          "to (4) ______ their individual assignments before the deadline. " +
+          "At the end of the quarter, the director presented a summary to " +
+          "(5) ______ the formal project cycle.",
+
+        words: [
+          "initiate",
+          "commence",
+          "procure",
+          "accomplish",
+          "conclude"
+        ],
+
+        answers: [
+          "initiate",
+          "commence",
+          "procure",
+          "accomplish",
+          "conclude"
+        ]
+      }
+
+    ]
+  },
+
+
+  /* =======================================================
+     HARD
+     ======================================================= */
+
+  hard: {
+    title: "HARD LEVEL",
+    className: "hard",
+
+    questions: [
+
+      {
+        type: "multiple",
+        question: "21",
+        baseWord: "REMEMBER",
+        scenario:
+          "When you bring a forgotten event, fact, or experience back to your memory, which word best fits?",
+
+        choices: [
+          {
+            word: "Obliterate",
+            correct: false,
+            explanation:
+              "To destroy utterly or wipe out from existence or memory."
+          },
+          {
+            word: "Recollect",
+            correct: true,
+            explanation:
+              "To remember or call back something to mind from memory."
+          },
+          {
+            word: "Suppress",
+            correct: false,
+            explanation:
+              "To consciously prevent the recall of a memory or feeling."
+          }
+        ]
+      },
+
+      {
+        type: "multiple",
+        question: "22",
+        baseWord: "LEARN",
+        scenario:
+          "When you fully understand the meaning or nature of something, which advanced vocabulary word best fits?",
+
+        choices: [
+          {
+            word: "Comprehend",
+            correct: true,
+            explanation:
+              "To fully grasp or understand the nature and meaning of something."
+          },
+          {
+            word: "Misconstrue",
+            correct: false,
+            explanation:
+              "To interpret something incorrectly or misunderstand."
+          },
+          {
+            word: "Overlook",
+            correct: false,
+            explanation:
+              "To fail to notice or consider something vital."
+          }
+        ]
+      },
+
+      {
+        type: "multiple",
+        question: "23",
+        baseWord: "MEET",
+        scenario:
+          "When people come together or assemble for a formal meeting or purpose, which word best fits?",
+
+        choices: [
+          {
+            word: "Disperse",
+            correct: false,
+            explanation:
+              "To go or send in different directions; to scatter."
+          },
+          {
+            word: "Convene",
+            correct: true,
+            explanation:
+              "To come together or assemble for a formal meeting or purpose."
+          },
+          {
+            word: "Seclude",
+            correct: false,
+            explanation:
+              "To keep away or isolate from other people."
+          }
+        ]
+      },
+
+      {
+        type: "multiple",
+        question: "24",
+        baseWord: "VISIT",
+        scenario:
+          "When you visit a place often or habitually, which word best describes the action?",
+
+        choices: [
+          {
+            word: "Frequent",
+            correct: true,
+            explanation:
+              "To visit a place often or habitually."
+          },
+          {
+            word: "Avoid",
+            correct: false,
+            explanation:
+              "To keep away from or stop oneself from doing something."
+          },
+          {
+            word: "Shun",
+            correct: false,
+            explanation:
+              "To persistently avoid, ignore, or reject someone or something."
+          }
+        ]
+      },
+
+      {
+        type: "multiple",
+        question: "25",
+        baseWord: "STAY",
+        scenario:
+          "When you live or stay in a particular place for a long period of time, which word best fits?",
+
+        choices: [
+          {
+            word: "Reside",
+            correct: true,
+            explanation:
+              "To live or stay in a particular place permanently or for an extended period."
+          },
+          {
+            word: "Abscond",
+            correct: false,
+            explanation:
+              "To leave hurriedly and secretly, typically to avoid detection."
+          },
+          {
+            word: "Evacuate",
+            correct: false,
+            explanation:
+              "To remove someone from a place of danger to a safe place."
+          }
+        ]
+      },
+
+      {
+        type: "fill",
+        question: "Textual Exercise 5",
+        title: "Hard Fill-in-the-Blank",
+        scenario:
+          "Read the passage and fill in each blank with the correct advanced vocabulary word.",
+
+        passage:
+          "Historians often (1) ______ at annual conferences to discuss " +
+          "historical discoveries. During these events, scholars share " +
+          "findings that help attendees (2) ______ complex historical " +
+          "contexts that were previously misunderstood. Many researchers " +
+          "who (3) ______ near national archives (4) ______ the research " +
+          "rooms to analyze rare manuscripts. Older scholars can often " +
+          "(5) ______ precise primary details from past excavations with " +
+          "remarkable clarity.",
+
+        words: [
+          "recollect",
+          "comprehend",
+          "convene",
+          "frequent",
+          "reside"
+        ],
+
+        answers: [
+          "convene",
+          "comprehend",
+          "reside",
+          "frequent",
+          "recollect"
+        ]
+      }
+
+    ]
+  }
+
+};
+
+
+/* =========================================================
+   GAME VARIABLES
+   ========================================================= */
+
+var currentLevel = "";
+var currentIdx = 0;
+var totalScore = 0;
+var levelScore = 0;
+
+
+/* =========================================================
+   START LEVEL
+   ========================================================= */
+
+function startLevel(level) {
+
+  currentLevel = level;
+  currentIdx = 0;
+  levelScore = 0;
+
+  document.getElementById("level-stage")
+    .classList.add("hidden");
+
+  document.getElementById("result-stage")
+    .classList.add("hidden");
+
+  document.getElementById("game-stage")
+    .classList.remove("hidden");
+
+  renderQuestion();
+}
+
+
+/* =========================================================
+   RENDER QUESTION
+   ========================================================= */
+
+function renderQuestion() {
+
+  var level = gameData[currentLevel];
+  var q = level.questions[currentIdx];
+
+  var badge =
+    '<span class="level-badge ' +
+    level.className +
+    '">' +
+    level.title +
+    "</span>";
+
+  document.getElementById("level-badge").innerHTML = badge;
+
+  document.getElementById("question-number").innerText =
+    "Question " +
+    (currentIdx + 1) +
+    " of " +
+    level.questions.length;
+
+  var progress =
+    (currentIdx / level.questions.length) * 100;
+
+  document.getElementById("progress-bar").style.width =
+    progress + "%";
+
+  document.getElementById("explanation-box")
+    .style.display = "none";
+
+  document.getElementById("next-btn")
+    .classList.add("hidden");
+
+  if (q.type === "multiple") {
+    renderMultipleChoice(q);
+  } else {
+    renderFillExercise(q);
+  }
+}
+
+
+/* =========================================================
+   MULTIPLE CHOICE
+   ========================================================= */
+
+function renderMultipleChoice(q) {
+
+  document.getElementById("scenario-box").innerHTML =
+    "<strong>Base Concept: " +
+    q.baseWord +
+    "</strong><br><br>" +
+    q.scenario;
+
+  var html = "";
+
+  for (var i = 0; i < q.choices.length; i++) {
+
+    html +=
+      '<button class="btn" id="btn-' +
+      i +
+      '" onclick="checkMultipleAnswer(' +
+      i +
+      ')">' +
+      String.fromCharCode(65 + i) +
+      ". " +
+      q.choices[i].word +
+      "</button>";
+  }
+
+  document.getElementById("choices-box").innerHTML =
+    html;
+
+  document.getElementById("fill-box").innerHTML =
+    "";
+}
+
+
+/* =========================================================
+   CHECK MULTIPLE CHOICE
+   ========================================================= */
+
+function checkMultipleAnswer(selectedIndex) {
+
+  var q =
+    gameData[currentLevel].questions[currentIdx];
+
+  for (var i = 0; i < q.choices.length; i++) {
+
+    var btn =
+      document.getElementById("btn-" + i);
+
+    btn.disabled = true;
+
+    if (q.choices[i].correct) {
+
+      btn.className =
+        "btn correct";
+
+    } else if (i === selectedIndex) {
+
+      btn.className =
+        "btn wrong";
+    }
+  }
+
+  if (q.choices[selectedIndex].correct) {
+    addScore(100);
+  }
+
+  var expHtml = "";
+
+  for (var j = 0; j < q.choices.length; j++) {
+
+    var mark =
+      q.choices[j].correct
+        ? " ✅ Correct Answer"
+        : " ❌";
+
+    expHtml +=
+      '<div class="exp-item">' +
+      "<strong>" +
+      q.choices[j].word +
+      mark +
+      "</strong><br>" +
+      q.choices[j].explanation +
+      "</div>";
+  }
+
+  showExplanation(expHtml);
+}
+
+
+/* =========================================================
+   FILL-IN-THE-BLANK
+   ========================================================= */
+
+function renderFillExercise(q) {
+
+  document.getElementById("scenario-box").innerHTML =
+    "<strong>" +
+    q.title +
+    "</strong><br><br>" +
+    q.scenario;
+
+  document.getElementById("choices-box").innerHTML =
+    "";
+
+  var wordsHtml =
+    '<div class="word-bank">' +
+    "<strong>Word Bank:</strong><br>";
+
+  for (var w = 0; w < q.words.length; w++) {
+
+    wordsHtml +=
+      '<span class="word">' +
+      q.words[w] +
+      "</span>";
+  }
+
+  wordsHtml += "</div>";
+
+  var passageHtml =
+    '<div class="blank-question">' +
+    q.passage.replace(
+      /\(([1-5])\)\s*______?/g,
+      function(match, number) {
+
+        return (
+          "<strong>(" +
+          number +
+          ")</strong> " +
+
+          '<input class="fill-input" ' +
+          'id="fill-' +
+          number +
+          '" ' +
+          'placeholder="Enter your answer">'
+        );
+      }
+    ) +
+    "</div>";
+
+  var submitButton =
+    '<button class="next-btn" ' +
+    'style="display:block;" ' +
+    'onclick="checkFillAnswers()">' +
+    "Check Answers ✓" +
+    "</button>";
+
+  document.getElementById("fill-box").innerHTML =
+    wordsHtml +
+    passageHtml +
+    submitButton;
+}
+
+
+/* =========================================================
+   CHECK FILL-IN ANSWERS
+   ========================================================= */
+
+function checkFillAnswers() {
+
+  var q =
+    gameData[currentLevel].questions[currentIdx];
+
+  var correctCount = 0;
+  var expHtml = "";
+
+  for (var i = 0; i < q.answers.length; i++) {
+
+    var input =
+      document.getElementById("fill-" + (i + 1));
+
+    var userAnswer =
+      input.value.trim().toLowerCase();
+
+    var correctAnswer =
+      q.answers[i].toLowerCase();
+
+    if (userAnswer === correctAnswer) {
+
+      correctCount++;
+
+      input.style.borderColor =
+        "#2d6a4f";
+
+      input.style.background =
+        "#1b4332";
+
+    } else {
+
+      input.style.borderColor =
+        "#800f2f";
+
+      input.style.background =
+        "#4a0e17";
+    }
+
+    input.disabled = true;
+
+    expHtml +=
+      '<div class="exp-item">' +
+      "<strong>Blank " +
+      (i + 1) +
+      ":</strong> " +
+
+      (
+        userAnswer === correctAnswer
+          ? " ✅ Correct"
+          : " ❌ Correct answer: " +
+            q.answers[i]
+      ) +
+
+      "</div>";
+  }
+
+  addScore(correctCount * 20);
+
+  showExplanation(expHtml);
+
+  var submitButtons =
+    document.querySelectorAll(
+      "#fill-box .next-btn"
+    );
+
+  if (submitButtons.length > 0) {
+    submitButtons[0].style.display =
+      "none";
+  }
+}
+
+
+/* =========================================================
+   SCORE
+   ========================================================= */
+
+function addScore(points) {
+
+  totalScore += points;
+  levelScore += points;
+
+  document.getElementById("score").innerText =
+    "Score: " + totalScore + " XP";
+}
+
+
+/* =========================================================
+   SHOW EXPLANATION
+   ========================================================= */
+
+function showExplanation(html) {
+
+  document.getElementById("exp-content").innerHTML =
+    html;
+
+  document.getElementById("explanation-box")
+    .style.display = "block";
+
+  document.getElementById("next-btn")
+    .classList.remove("hidden");
+
+  if (
+    currentIdx ===
+    gameData[currentLevel].questions.length - 1
+  ) {
+
+    document.getElementById("next-btn").innerText =
+      "Finish Level 🎉";
+
+  } else {
+
+    document.getElementById("next-btn").innerText =
+      "Next Question →";
+  }
+}
+
+
+/* =========================================================
+   NEXT QUESTION
+   ========================================================= */
+
+function nextQuestion() {
+
+  currentIdx++;
+
+  if (
+    currentIdx <
+    gameData[currentLevel].questions.length
+  ) {
+
+    renderQuestion();
+
+  } else {
+
+    showResults();
+  }
+}
+
+
+/* =========================================================
+   SHOW RESULTS
+   ========================================================= */
+
+function showResults() {
+
+  document.getElementById("game-stage")
+    .classList.add("hidden");
+
+  document.getElementById("result-stage")
+    .classList.remove("hidden");
+
+  var level =
+    gameData[currentLevel];
+
+  document.getElementById("final-score").innerText =
+    levelScore + " XP";
+
+  document.getElementById("result-message").innerText =
+    "You completed the " +
+    level.title +
+    "! Your total game score is " +
+    totalScore +
+    " XP.";
+}
+
+
+/* =========================================================
+   RESTART SAME LEVEL
+   ========================================================= */
+
+function restartGame() {
+
+  currentIdx = 0;
+  levelScore = 0;
+
+  document.getElementById("game-stage")
+    .classList.remove("hidden");
+
+  document.getElementById("result-stage")
+    .classList.add("hidden");
+
+  renderQuestion();
+}
+
+
+/* =========================================================
+   CHOOSE ANOTHER LEVEL
+   ========================================================= */
+
+function chooseLevel() {
+
+  document.getElementById("result-stage")
+    .classList.add("hidden");
+
+  document.getElementById("game-stage")
+    .classList.add("hidden");
+
+  document.getElementById("level-stage")
+    .classList.remove("hidden");
+}
+
+</script>
+
+</body> 
+</html>
